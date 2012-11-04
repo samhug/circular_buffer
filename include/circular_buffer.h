@@ -13,10 +13,16 @@ class CircularBuffer
 
         size_t size() const { return size_; }
         size_t capacity() const { return capacity_; }
+
         // Return number of bytes written.
         size_t write(const T *data, size_t count);
+        //size_t write(const T *data, size_t count, size_t overlap);
+
+        T* at(size_t offset);
+
         // Return number of bytes read.
         size_t read(T *data, size_t count);
+        size_t read(T *data, size_t count, bool del);
 
     private:
         size_t beg_index_, end_index_, size_, capacity_;
@@ -38,6 +44,12 @@ CircularBuffer<T>::~CircularBuffer()
 {
     delete [] data_;
 }
+
+/*template <class T>
+size_t CircularBuffer<T>::write(const T *data, size_t count)
+{
+    return write(data, count, 0);
+}*/
 
 template <class T>
 size_t CircularBuffer<T>::write(const T *data, size_t count)
@@ -69,7 +81,23 @@ size_t CircularBuffer<T>::write(const T *data, size_t count)
 }
 
 template <class T>
+T* CircularBuffer<T>::at(size_t offset)
+{
+    if (offset > size()) {
+        // TODO: Freak out... Idiot Alert.
+    }
+
+    return (T*)((void*)data_ + end_index_) - offset;
+}
+
+template <class T>
 size_t CircularBuffer<T>::read(T *data, size_t count)
+{
+    return read(data, count, true);
+}
+
+template <class T>
+size_t CircularBuffer<T>::read(T *data, size_t count, bool del)
 {
     if (count == 0) return 0;
 
@@ -80,8 +108,10 @@ size_t CircularBuffer<T>::read(T *data, size_t count)
     if (bytes_to_read <= capacity*sizeof(T) - beg_index_)
     {
         memcpy(data, (void*)data_ + beg_index_, bytes_to_read);
-        beg_index_ += bytes_to_read;
-        if (beg_index_ == capacity*sizeof(T)) beg_index_ = 0;
+        if (del) {
+            beg_index_ += bytes_to_read;
+            if (beg_index_ == capacity*sizeof(T)) beg_index_ = 0;
+        }
     }
     // Read in two steps
     else
@@ -90,10 +120,14 @@ size_t CircularBuffer<T>::read(T *data, size_t count)
         memcpy(data, (void*)data_ + beg_index_, size_1);
         size_t size_2 = bytes_to_read - size_1;
         memcpy((void*)data + size_1, data_, size_2);
-        beg_index_ = size_2;
+        if (del) {
+            beg_index_ = size_2;
+        }
     }
 
-    size_ -= bytes_to_read;
+    if (del) {
+        size_ -= bytes_to_read;
+    }
     return bytes_to_read;
 }
 
