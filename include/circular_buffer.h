@@ -47,8 +47,6 @@ CircularBuffer<T>::~CircularBuffer()
 template <class T>
 size_t CircularBuffer<T>::write(const T *data, size_t count)
 {
-    assert(count <= capacity() - size());
-
     if (count == 0) return 0;
 
     size_t items_to_write = std::min(count, capacity() - size());
@@ -92,8 +90,6 @@ size_t CircularBuffer<T>::read(T *data, size_t count)
 template <class T>
 size_t CircularBuffer<T>::read(T *data, size_t count, bool del)
 {
-    assert(count <= size());
-
     if (count == 0) return 0;
 
     size_t items_to_read = std::min(count, size());
