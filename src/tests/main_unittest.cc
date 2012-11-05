@@ -27,10 +27,13 @@ TEST(MainTest, size) {
     buffer->write(o, 5);
 
     ASSERT_EQ(5, buffer->size());
+<<<<<<< HEAD
 
     buffer->read(o, 5);
 
     ASSERT_EQ(0, buffer->size());
+=======
+>>>>>>> origin/master
 }
 
 TEST(MainTest, NonDestructiveRead) {
