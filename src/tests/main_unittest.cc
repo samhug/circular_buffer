@@ -1,7 +1,7 @@
 #include <sstream>
 #include <gtest/gtest.h>
 
-#include "circular_buffer.h"
+#include "circular_buffer/circular_buffer.h"
 
 TEST(MainTest, basic) {
     CircularBuffer<int> *buffer = new CircularBuffer <int> (5);
@@ -25,15 +25,10 @@ TEST(MainTest, size) {
     int o[] = {0,1,2,3,4};
 
     buffer->write(o, 5);
-
     ASSERT_EQ(5, buffer->size());
-<<<<<<< HEAD
 
     buffer->read(o, 5);
-
     ASSERT_EQ(0, buffer->size());
-=======
->>>>>>> origin/master
 }
 
 TEST(MainTest, NonDestructiveRead) {
