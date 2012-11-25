@@ -27,10 +27,21 @@ template <class T>
 class CircularBuffer
 {
     public:
-        CircularBuffer(size_t capacity);
+        CircularBuffer(size_t capacity_);
         ~CircularBuffer();
 
+        /**
+         * The number of items currently being stored in the buffer.
+         *
+         * @return The size of the buffer.
+         */
         size_t size() const { return size_; }
+
+        /**
+         * The number of items the container is capable of storing.
+         *
+         * @return The capacity of the buffer.
+         */
         size_t capacity() const { return capacity_; }
 
         // Return number of items written.
@@ -54,24 +65,42 @@ class CircularBuffer
         T *data_end_ptr;
 };
 
+
+/**
+ * Constructor for the CircularBuffer container type.
+ *
+ * @param[in] capacity_ The number of items the container should hold.
+ */
 template <class T>
-CircularBuffer<T>::CircularBuffer(size_t capacity) :
+CircularBuffer<T>::CircularBuffer(size_t capacity_) :
     size_(0), 
-    capacity_(capacity)
+    capacity_(capacity_)
 {
-    data_beg_ptr = new T[capacity];
-    data_end_ptr = data_beg_ptr + capacity;
+    data_beg_ptr = new T[capacity_];
+    data_end_ptr = data_beg_ptr + capacity_;
 
     cursor_beg_ptr = data_beg_ptr;
     cursor_end_ptr = cursor_beg_ptr;
 }
 
+
+/**
+ * Frees all memory allocated by the container.
+ */
 template <class T>
 CircularBuffer<T>::~CircularBuffer()
 {
     delete [] data_beg_ptr;
 }
 
+
+/**
+ * Writes `count` items from `data` into the container.
+ *
+ * @param[in] data A pointer to the items you wish to write.
+ * @param[in] count The number of items two write.
+ * @return The number of items writen.
+ */
 template <class T>
 size_t CircularBuffer<T>::write(const T *data, size_t count)
 {
@@ -106,6 +135,13 @@ size_t CircularBuffer<T>::write(const T *data, size_t count)
     return count;
 }
 
+
+/**
+ * Retrieve the item at the specified location.
+ *
+ * @param[in] offset The offset from the beginning of the data structure.
+ * @return The item at the given offset.
+ */
 template <class T>
 T* CircularBuffer<T>::at(size_t offset)
 {
@@ -114,12 +150,30 @@ T* CircularBuffer<T>::at(size_t offset)
     return data_beg_ptr + offset;
 }
 
+
+/**
+ * Pops `count` items off the buffer, and stores them in `data`.
+ *
+ * @param[out] data A pointer to the location to store the read items.
+ * @param[in]  count The number of items to read.
+ * @return The number of items read.
+ */
 template <class T>
 size_t CircularBuffer<T>::read(T *data, size_t count)
 {
     return read(data, count, true);
 }
 
+
+/**
+ * Reads `count` items from the buffer, and stores them in `data`. If `del`
+ * is true, delete the items from the buffer as well.
+ *
+ * @param[out] data A pointer to the location to store the read items.
+ * @param[in]  count The number of items to read.
+ * @param[in]  del If false, items will not be deleted as they are read.
+ * @return The number of items read.
+ */
 template <class T>
 size_t CircularBuffer<T>::read(T *data, size_t count, bool del)
 {
