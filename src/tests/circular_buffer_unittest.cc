@@ -3,15 +3,21 @@
 
 #include "circular_buffer/circular_buffer.h"
 
+TEST(MainTest, capacity) {
+    CircularBuffer<int> buffer(5);
+
+    EXPECT_EQ(5, buffer.capacity());
+}
+
 TEST(MainTest, basic) {
-    CircularBuffer<int> *buffer = new CircularBuffer <int> (5);
+    CircularBuffer<int> buffer(5);
 
     std::stringstream s;
 
     int o;
     for (int i=0; i<=30; i++) {
-        buffer->write(&i, 1);
-        buffer->read(&o, 1);
+        buffer.write(&i, 1);
+        buffer.read(&o, 1);
 
         s << o << ',';
     }
@@ -20,43 +26,63 @@ TEST(MainTest, basic) {
 }
 
 TEST(MainTest, size) {
-    CircularBuffer<int> *buffer = new CircularBuffer <int> (5);
+    CircularBuffer<int> buffer(5);
 
     int o[] = {0,1,2,3,4};
 
-    buffer->write(o, 5);
-    ASSERT_EQ(5, buffer->size());
+    buffer.write(o, 3);
+    ASSERT_EQ(3, buffer.size());
 
-    buffer->read(o, 5);
-    ASSERT_EQ(0, buffer->size());
+    buffer.read(o, 3);
+    ASSERT_EQ(0, buffer.size());
+
+    buffer.write(o, 4);
+    ASSERT_EQ(4, buffer.size());
+
+    buffer.read(o, 4);
+    ASSERT_EQ(0, buffer.size());
 }
 
 TEST(MainTest, NonDestructiveRead) {
-    CircularBuffer<int> *buffer = new CircularBuffer <int> (5);
+    CircularBuffer<char> buffer(10);
 
-    int a[] = {0,1,2,3,4};
-    buffer->write(a, 5);
+    char in[10] = "abcdefghi";
+    buffer.write(in, 10);
 
-    int ii[5];
-    buffer->read(ii, 5, false);
 
-    ASSERT_EQ(5, buffer->size());
+    char out1[5];
+    buffer.read(out1, 5, false);
 
-    std::stringstream s;
+    EXPECT_EQ(10, buffer.size());
+    EXPECT_STREQ("abcde", out1);
 
-    int i;
-    for (i=0; i<5; i++)
-        s << ii[i] << ',';
 
-    ASSERT_STREQ(s.str().c_str(), "0,1,2,3,4,");
+    char out2[10];
+    buffer.read(out2, 10);
 
-    std::stringstream s2;
+    EXPECT_EQ(0, buffer.size());
+    EXPECT_STREQ(in, out2);
+}
 
-    int o;
-    for (i=0; i<5; i++) {
-        buffer->read(&o, 1);
-        s2 << o << ',';
-    }
+TEST(MainTest, Overread) {
+    CircularBuffer<char> buffer(10);
 
-    ASSERT_STREQ(s2.str().c_str(), "0,1,2,3,4,");
+    char in[10] = "abcdefghi";
+    buffer.write(in, 10);
+
+    char out[15];
+    EXPECT_DEATH(buffer.read(out, 15), "");
+}
+
+TEST(MainTest, Overwrite) {
+    CircularBuffer<char> buffer(10);
+
+    char in[10] = "abcdefghi";
+    buffer.write(in, 10);
+
+    char out1[5];
+    buffer.read(out1, 5);
+
+    char in2[10] = "jklmnopqr";
+    EXPECT_DEATH(buffer.write(in2, 9), "");
 }

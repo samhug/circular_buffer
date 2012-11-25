@@ -10,6 +10,8 @@ def options(opt):
 def configure(conf):
     conf.load('compiler_cxx unittest_gtest doxygen')
 
+    conf.env.CXXFLAGS = ['-Wall', '-g3']
+
 def build(bld):
     
     # Compile tests
