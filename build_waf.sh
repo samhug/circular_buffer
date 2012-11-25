@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WAF_VERSION=1.7.5
+WAF_VERSION=1.7.6
 WAF_EXTRAS=doxygen,unittest_gtest
 
 

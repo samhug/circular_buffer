@@ -4,5 +4,4 @@
 unittest_gtest.pyc
 
 build/
-waf
 *.swp
